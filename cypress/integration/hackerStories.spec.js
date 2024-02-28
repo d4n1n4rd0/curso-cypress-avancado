@@ -1,5 +1,5 @@
 describe('Hacker Stories', () => {
-  beforeEach(() => {
+  beforeEach(() => { 
     cy.intercept({
       method: 'GET',
       pathname: '**/search',
@@ -7,7 +7,7 @@ describe('Hacker Stories', () => {
         query: 'React',
         page: '0'
       }
-    }).as('getStories')
+    }).as('getStories') 
 
     cy.visit('/')
     cy.wait('@getStories')
@@ -65,15 +65,6 @@ describe('Hacker Stories', () => {
       it('orders by comments', () => {})
 
       it('orders by points', () => {})
-    })
-
-    // Hrm, how would I simulate such errors?
-    // Since I still don't know, the tests are being skipped.
-    // TODO: Find a way to test them out.
-    context.skip('Errors', () => {
-      it('shows "Something went wrong ..." in case of a server error', () => {})
-
-      it('shows "Something went wrong ..." in case of a network error', () => {})
     })
   })
 
@@ -160,5 +151,44 @@ describe('Hacker Stories', () => {
           .should('have.length', 5)
       })
     })
+  })
+})
+
+context('Errors', () => {
+  const errorMsg = 'Something went wrong'
+  it('shows "Something went wrong ..." in case of a server error', () => {
+    cy.intercept(
+      'GET',
+      '**/search**',
+      { statusCode: 500 }
+    ).as('getServerFailure')
+
+    cy.visit('/')
+
+    cy.get('#search')
+    cy.contains('Submit')
+      .click()
+
+    cy.wait('@getServerFailure')
+
+    cy.contains(errorMsg)
+      .should('be.visible') 
+  })
+  it('shows "Something went wrong ..." in case of a network error', () => {
+    cy.intercept(
+      'GET',
+      '**/search?query=React&page=0',
+      { forceNetworkError: true }
+    ).as('getNetworkFailure')
+
+    cy.visit('/')
+
+    cy.contains('Submit')
+      .click()
+
+    cy.wait('@getNetworkFailure')
+
+    cy.contains(errorMsg)
+      .should('be.visible')
   })
 })
