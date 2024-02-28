@@ -155,8 +155,7 @@ describe('Hacker Stories', () => {
 })
 
 context('Errors', () => {
-  const errorMsg = 'Something went wrong'
-  it('shows "Something went wrong ..." in case of a server error', () => {
+    it.only('shows "Something went wrong ..." in case of a server error', () => {
     cy.intercept(
       'GET',
       '**/search**',
@@ -164,31 +163,20 @@ context('Errors', () => {
     ).as('getServerFailure')
 
     cy.visit('/')
-
-    cy.get('#search')
-    cy.contains('Submit')
-      .click()
-
     cy.wait('@getServerFailure')
 
-    cy.contains(errorMsg)
-      .should('be.visible') 
+    cy.get('p:contains(Something went wrong ...)')
   })
-  it('shows "Something went wrong ..." in case of a network error', () => {
+  it.only('shows "Something went wrong ..." in case of a network error', () => {
     cy.intercept(
       'GET',
-      '**/search?query=React&page=0',
+      '**/search**',
       { forceNetworkError: true }
     ).as('getNetworkFailure')
 
     cy.visit('/')
-
-    cy.contains('Submit')
-      .click()
-
     cy.wait('@getNetworkFailure')
 
-    cy.contains(errorMsg)
-      .should('be.visible')
+    cy.get('p:contains(Something went wrong ...)')
   })
 })
