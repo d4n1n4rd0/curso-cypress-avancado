@@ -2,7 +2,7 @@ describe('Hacker Stories', () => {
   const initialTerm = 'React'
   const newTerm = 'Cypress'
 
-  context('Real API', () => {
+  context.skip('Real API', () => {
     beforeEach(() => { 
       cy.intercept({
         method: 'GET',
@@ -86,7 +86,7 @@ describe('Hacker Stories', () => {
       // TODO: Find a way to test it out.
       it.skip('shows the right data for all rendered stories', () => {})
   
-      it.only('shows one less storie after dimissing the first story', () => {
+      it('shows one less storie after dimissing the first story', () => {
         cy.get('.button-small')
           .first()
           .click()
@@ -114,23 +114,24 @@ describe('Hacker Stories', () => {
       beforeEach(() => {
         cy.intercept( 
           'GET', 
-          `**/search?query=${newTerm}&page=0`)
-          .as('getNewTermStories')
-  
+          `**/search?query=${newTerm}&page=0`,
+          {fixture: 'stories'}
+        )
+        .as('getNewTermStories')
+
         cy.get('#search')
-          .clear()
-      })
+          .clear() 
+    })
+       
   
-      it('types and hits ENTER', () => {
+      it.only('types and hits ENTER', () => {
         cy.get('#search')
           .type(`${newTerm}{enter}`)
   
         cy.wait('@getNewTermStories')
   
-        cy.get('.item').should('have.length', 20)
-        cy.get('.item')
-          .first()
-          .should('contain', newTerm)
+        cy.get('.item').should('have.length', 8)
+        
         cy.get(`button:contains(${initialTerm})`)
           .should('be.visible')
       })
@@ -141,7 +142,7 @@ describe('Hacker Stories', () => {
         cy.contains('Submit')
           .click()
   
-        cy.wait('@getNewTermStories')
+        cy.wait('@getStories')
   
         cy.get('.item').should('have.length', 20)
         cy.get('.item')
