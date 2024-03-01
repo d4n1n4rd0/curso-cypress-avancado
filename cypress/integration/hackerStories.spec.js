@@ -155,11 +155,8 @@ describe('Hacker Stories', () => {
         cy.wait('@getStories')
 
         cy.get('.item').should('have.length', 2)
-        /*cy.get('.item')
-          .first()
-          .should('contain', newTerm)
         cy.get(`button:contains(${initialTerm})`)
-          .should('be.visible')*/
+          .should('be.visible')
       })
 
       context('Last searches', () => {
@@ -168,7 +165,8 @@ describe('Hacker Stories', () => {
 
           cy.intercept(
             'GET',
-            '**/search**'
+            '**/search**',
+            { fixture: 'emptyStories'}
           ).as('getRandomStories')
 
           Cypress._.times(6, () => {
